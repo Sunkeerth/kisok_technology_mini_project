@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Symptom Selector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      font-size: 1.1em;
+      color: #555;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .symptom-category {
+      margin-bottom: 20px;
+    }
+    .symptom-category h3 {
+      color: #333;
+      font-size: 1.2em;
+    }
+    .symptom-category label {
+      display: block;
+      font-size: 1em;
+      color: #333;
+      margin: 8px 0;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005b99;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Select Your Symptoms</h1>
+    <p>Symptoms will be selected manually. Please check the symptoms that apply to you.</p>
+
+    <form id="symptomForm">
+      <!-- Dynamic Symptom Categories will be populated here -->
+      <div id="symptomCategories"></div>
+
+      <div class="form-group">
+        <button type="button" onclick="proceedToAppointment()">Next</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Sample dynamic data for symptoms and doctors
+    const symptomCategories = [
+      {
+        name: "Common Symptoms",
+        symptoms: ["Fever", "Cough", "Sore Throat", "Headache"]
+      },
+      {
+        name: "Fatigue and Body Pain",
+        symptoms: ["Tiredness", "Body Aches", "Chills"]
+      },
+      {
+        name: "Breathing and Other Symptoms",
+        symptoms: ["Shortness of Breath", "Loss of Smell", "Nausea"]
+      },
+      {
+        name: "Additional Symptoms",
+        symptoms: ["Dizziness", "Rash", "Vomiting"]
+      }
+    ];
+
+    const doctorDatabase = {
+      "Fever": { name: "Dr. Smith", specialty: "General Physician", contact: "123-456-7890", email: "smith@example.com" },
+      "Cough": { name: "Dr. James", specialty: "Pulmonologist", contact: "321-654-9870", email: "james@example.com" },
+      "Sore Throat": { name: "Dr. Brown", specialty: "ENT Specialist", contact: "234-567-8901", email: "brown@example.com" },
+      "Headache": { name: "Dr. Lee", specialty: "Neurologist", contact: "345-678-9012", email: "lee@example.com" },
+      "Tiredness": { name: "Dr. White", specialty: "General Physician", contact: "456-789-0123", email: "white@example.com" },
+      "Body Aches": { name: "Dr. Green", specialty: "Rheumatologist", contact: "567-890-1234", email: "green@example.com" },
+      "Chills": { name: "Dr. Black", specialty: "Infectious Disease Specialist", contact: "678-901-2345", email: "black@example.com" },
+      "Shortness of Breath": { name: "Dr. Blue", specialty: "Pulmonologist", contact: "789-012-3456", email: "blue@example.com" },
+      "Loss of Smell": { name: "Dr. Grey", specialty: "Otolaryngologist", contact: "890-123-4567", email: "grey@example.com" },
+      "Nausea": { name: "Dr. Orange", specialty: "Gastroenterologist", contact: "901-234-5678", email: "orange@example.com" },
+      "Dizziness": { name: "Dr. Pink", specialty: "Neurologist", contact: "123-234-3456", email: "pink@example.com" },
+      "Rash": { name: "Dr. Purple", specialty: "Dermatologist", contact: "234-345-4567", email: "purple@example.com" },
+      "Vomiting": { name: "Dr. Red", specialty: "Gastroenterologist", contact: "345-456-5678", email: "red@example.com" },
+    };
+
+    // Dynamically populate symptom categories and checkboxes
+    function generateSymptomCategories() {
+      const container = document.getElementById("symptomCategories");
+
+      symptomCategories.forEach(category => {
+        const categoryDiv = document.createElement("div");
+        categoryDiv.classList.add("symptom-category");
+
+        const categoryTitle = document.createElement("h3");
+        categoryTitle.textContent = category.name;
+        categoryDiv.appendChild(categoryTitle);
+
+        category.symptoms.forEach(symptom => {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.name = category.name.toLowerCase().replace(" ", "_");
+          input.value = symptom;
+
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(` ${symptom}`));
+
+          categoryDiv.appendChild(label);
+        });
+
+        container.appendChild(categoryDiv);
+      });
+    }
+
+    function proceedToAppointment() {
+      const selectedSymptoms = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+      checkboxes.forEach((checkbox) => {
+        selectedSymptoms.push(checkbox.value);
+      });
+
+      if (selectedSymptoms.length === 0) {
+        alert("Please select at least one symptom.");
+        return;
+      }
+
+      fetchDoctorsForSymptoms(selectedSymptoms);
+    }
+
+    function fetchDoctorsForSymptoms(symptoms) {
+      const assignedDoctors = [];
+
+      symptoms.forEach(symptom => {
+        if (doctorDatabase[symptom]) {
+          assignedDoctors.push(doctorDatabase[symptom]);
+        }
+      });
+
+      // Store symptoms and assigned doctors for the next page
+      sessionStorage.setItem("selectedSymptoms", JSON.stringify(symptoms));
+      sessionStorage.setItem("assignedDoctors", JSON.stringify(assignedDoctors));
+
+      window.location.href = "appoinment-details.html";  // Redirect to patient report page
+    }
+
+    // Generate categories on page load
+    window.onload = generateSymptomCategories;
+  </script>
+</body>
+</html>

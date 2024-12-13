@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Report with QR Code</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f7fc;
+    }
+    .qr-code {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .details, .symptoms, .doctors {
+      margin-bottom: 20px;
+    }
+    .details h3, .symptoms h3, .doctors h3 {
+      color: #555;
+      margin-bottom: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul li {
+      margin: 5px 0;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-code">
+    <canvas id="qrCanvas"></canvas>
+  </div>
+  <div class="container">
+    <h1>Patient Report</h1>
+
+    <div class="details">
+      <h3>Patient Details</h3>
+      <ul id="detailsList">
+        <li>Name: John Doe</li>
+      </ul>
+    </div>
+
+    <div class="symptoms">
+      <h3>Selected Symptoms</h3>
+      <ul id="symptomList"></ul>
+    </div>
+
+    <div class="doctors">
+      <h3>Assigned Doctors</h3>
+      <ul id="doctorList"></ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    // Fetch symptoms and doctors data from sessionStorage
+    const symptoms = JSON.parse(sessionStorage.getItem("selectedSymptoms"));
+    const doctors = JSON.parse(sessionStorage.getItem("assignedDoctors"));
+
+    // Populate symptoms
+    const symptomList = document.getElementById("symptomList");
+    symptoms.forEach((symptom) => {
+      const li = document.createElement("li");
+      li.textContent = symptom;
+      symptomList.appendChild(li);
+    });
+
+    // Populate doctor details
+    const doctorList = document.getElementById("doctorList");
+    doctors.forEach((doctor) => {
+      const doctorLi = document.createElement("li");
+      doctorLi.innerHTML = `
+        <strong>${doctor.name}</strong> (${doctor.specialty})<br>
+        Contact: ${doctor.contact}<br>
+        Email: <a href="mailto:${doctor.email}">${doctor.email}</a>
+      `;
+      doctorList.appendChild(doctorLi);
+    });
+
+    // Generate QR code with the patient report data
+    function generateQrCode() {
+      const qrCanvas = document.getElementById("qrCanvas");
+      const data = {
+        patientDetails: { name: "rahul" },
+        selectedSymptoms: symptoms,
+        doctors: doctors
+      };
+      
+      QRCode.toCanvas(qrCanvas, JSON.stringify(data), { width: 150 }, function (error) {
+        if (error) console.error(error);
+      });
+    }
+
+    // Generate the QR code on page load
+    generateQrCode();
+
+    // Redirect to the second page after QR code generation
+    window.onload = function() {
+      setTimeout(function() {
+        window.location.href = "printdetails.html"; // Replace with the correct path to the second page
+      }, 2000); // Redirects after 2 seconds
+    };
+  </script>
+</body>
+</html>

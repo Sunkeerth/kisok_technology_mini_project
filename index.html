@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BITM - QR Code Scanner</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsqr"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+        color: #333;
+      }
+      #qr-video-container {
+        position: relative;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      #qr-video {
+        width: 100%;
+        height: auto;
+      }
+      #qr-data {
+        margin-top: 20px;
+        font-size: 1.2em;
+        text-align: center;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      #clear-btn {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #003366;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+      #clear-btn:hover {
+        background-color: #005b99;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="text-align: center; color: #003366">BITM - QR Code Scanner</h1>
+    <div id="qr-video-container">
+      <video id="qr-video" playsinline></video>
+    </div>
+    <div id="qr-data" style="opacity: 0"></div>
+    <button id="clear-btn" onclick="clearScannedData()">Clear Data</button>
+    <canvas id="qr-canvas" style="display: none"></canvas>
+
+    <script type="text/javascript">
+      // Access the camera
+      navigator.mediaDevices
+        .getUserMedia({ video: { facingMode: "environment" } })
+        .then(function (stream) {
+          const video = document.getElementById("qr-video");
+          video.srcObject = stream;
+          video.play();
+        })
+        .catch(function (err) {
+          console.error("Error accessing camera:", err);
+        });
+
+      let lastScanTime = Date.now();
+      const scanInterval = 1000; // Scan every 1000ms (1 second)
+      let previousScanData = null;
+
+      function scanQRCode() {
+        const video = document.getElementById("qr-video");
+        const canvasElement = document.getElementById("qr-canvas");
+        const canvas = canvasElement.getContext("2d");
+
+        if (Date.now() - lastScanTime < scanInterval) return;
+        lastScanTime = Date.now();
+
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+
+        const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
+
+        if (code) {
+          console.log("QR Code detected:", code.data);
+
+          if (previousScanData !== code.data) {
+            previousScanData = code.data;
+            handleScannedData(code.data);
+          }
+        }
+      }
+
+      function handleScannedData(data) {
+        const formattedData = parseScannedData(data);
+        displayQRCodeData(formattedData);
+        speak(formattedData);
+        saveScannedData(formattedData);
+      }
+
+      function parseScannedData(data) {
+    const parts = data.split(" ");
+    if (parts.length >= 8) {
+        return `Name: ${parts.slice(0, -7).join(" ")}    
+                USN: ${parts[parts.length - 7]}
+                Type: ${parts[parts.length - 6]} ${parts[parts.length - 5]}
+                Branch: ${parts[parts.length - 4]}
+                Date of Birth: ${parts[parts.length - 3]}
+                Passout: ${parts[parts.length - 2]}
+                Mobile No: ${parts[parts.length - 1]}`;
+    } else {
+        return "Invalid QR Code data format";
+    }
+}
+
+
+      function displayQRCodeData(data) {
+        const qrDataDiv = document.getElementById("qr-data");
+        qrDataDiv.innerHTML = "";
+
+        const lines = data.split("\n");
+        lines.forEach((line) => {
+          const p = document.createElement("p");
+          p.textContent = line;
+          qrDataDiv.appendChild(p);
+        });
+
+        qrDataDiv.style.opacity = 1;
+      }
+
+      function saveScannedData(data) {
+        const apiUrl = "http://localhost:3000/api/save-scanned-data";
+
+        const payload = {
+          qrData: data,
+        };
+
+        console.log("Sending data to backend:", payload);
+
+        fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((responseData) => {
+            console.log("Data saved successfully:", responseData);
+            alert("Scanned data saved to the database!");
+            // showNextButton(); // Show the Next button
+            window.location.href="symptom-selector.html";
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error.message || error);
+            alert("Failed to save scanned data. Please try again.");
+          });
+      }
+
+      function clearScannedData() {
+        document.getElementById("qr-data").style.opacity = 0;
+        document.getElementById("next-btn")?.remove(); // Remove the Next button if it exists
+      }
+
+      function speak(message) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function showNextButton() {
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Next";
+        nextButton.id = "next-btn";
+        nextButton.style.cssText = `
+          margin-top: 20px;
+          padding: 10px 20px;
+          background-color: #28a745;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1em;
+        `;
+        nextButton.onclick = function () {
+          window.location.href = "symptom-selector.html";
+        };
+        document.body.appendChild(nextButton);
+      }
+
+      window.onload = function () {
+        setInterval(scanQRCode, 250);
+        speak("Camera is active. Please show a QR code to scan.");
+      };
+    </script>
+    
+  </body>
+</html>

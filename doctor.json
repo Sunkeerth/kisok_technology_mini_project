@@ -1,0 +1,27 @@
+{
+    "Fever": [
+      {
+        "name": "Dr. John Doe",
+        "specialty": "General Physician",
+        "contact": "123-456-7890",
+        "email": "johndoe@example.com"
+      }
+    ],
+    "Cough": [
+      {
+        "name": "Dr. Jane Smith",
+        "specialty": "Pulmonologist",
+        "contact": "987-654-3210",
+        "email": "janesmith@example.com"
+      }
+    ],
+    "Sore Throat": [
+      {
+        "name": "Dr. Sarah Brown",
+        "specialty": "ENT Specialist",
+        "contact": "456-789-0123",
+        "email": "sarahbrown@example.com"
+      }
+    ]
+  }
+  

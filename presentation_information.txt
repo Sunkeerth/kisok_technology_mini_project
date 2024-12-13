@@ -1,0 +1,95 @@
+Project Title
+AI-Assisted Telemedicine KIOSK for Rural India
+
+Introduction :
+
+This project is designed to make healthcare more accessible in rural areas using AI and simple technologies like
+ QR codes and barcodes. The kiosk helps patients register, choose symptoms, and get doctor consultations quickly and easily. 
+It uses a voice assistant to guide users, making it suitable for everyone, including those who may not know how to use technology.
+
+Currently, since we don’t have access to Aadhaar QR codes or voter ID barcodes, we are demonstrating the system 
+using a college QR code as an example.
+
+Step-by-Step Workflow:
+
+Step 1: Scanning the QR Code:
+
+The process starts with the user scanning a QR code or barcode.
+This QR code could come from Aadhaar, a voter ID, or any similar document.
+After the code is scanned, the system reads the information and displays it on the screen.
+A voice assistant also speaks the details out loud so the user can understand them easily.
+
+Step 2: Symptoms Selection
+
+The user then clicks the "Next" button on the screen.
+A new page opens, showing a list of symptoms.
+The user selects the symptom(s) they are experiencing from the list.
+
+Step 3: Doctor Assignment and Printout:
+
+Once the symptoms are selected, the system automatically assigns a doctor and provides a room number 
+for the consultation.
+This information is printed on paper without any manual effort from the user.
+
+
+What Makes the Project Unique?
+
+Ease of Use:
+
+The system is designed to be simple. A user only needs to scan a QR code, click a few buttons, 
+and receive all the necessary information.
+
+Voice Assistant:
+
+For users who cannot read or understand the screen, the voice assistant 
+explains everything clearly.
+
+Automation:
+
+The entire process of registering, selecting symptoms, assigning doctors,
+ and printing details is automated, saving time for both patients and 
+medical staff.
+
+
+Future Enhancements
+
+Voice Recognition:
+
+In the future, the system will be upgraded with voice recognition technology.
+This will allow users to speak their commands, and the system will 
+do the work for them, like selecting symptoms or confirming their choice.
+
+Data Security with Quantum Encryption:
+
+To ensure complete privacy, we plan to use quantum encryption.
+This advanced encryption will protect patient data from hacking, 
+even with future technologies like quantum computers.
+
+Dynamic QR Codes:
+
+We will implement dynamic QR codes so that a single QR code can be 
+reused multiple times (more than five times) for different tasks.
+This feature will reduce the need for new QR codes for every action.
+
+
+Current Limitations
+
+Since we currently do not have access to Aadhaar QR codes or voter ID barcodes,
+ we are using a college QR code as a demonstration.
+However, the system is fully prepared to handle real Aadhaar 
+and voter ID data when access is granted.
+
+
+Conclusion
+
+This project is a step toward improving healthcare access 
+for rural areas in India. By using a combination of AI, QR codes,
+ and voice assistance, we aim to make the entire process of consulting
+ a doctor quick and user-friendly. Future upgrades like voice recognition, 
+quantum encryption, and dynamic QR codes will make the system even more 
+secure, powerful, and easy to use.
+
+Let me know if you need additional details, slides, or visuals for 
+your presentation!
+
+
